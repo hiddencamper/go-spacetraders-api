@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	APITools "https://github.com/hiddencamper/go-spacetraders-api"
+	APITools "github.com/hiddencamper/go-spacetraders-api/APITools"
 )
 
 func main() {
