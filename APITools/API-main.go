@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var st_URL = "http://spacetraders.io/api/v2/"
+const ST_URL = "https://api.spacetraders.io/v2/"
 
 var factions = []string{
 	"COSMIC",
@@ -39,19 +39,22 @@ func (a APIToolsErr) Error() string {
 	return a.err
 }
 
-func API_GetStatus() (map[string]interface{}, error) {
-	bytes, err := GetRequest(st_URL)
+func API_GetStatus() (*GetStatus, error) {
+	bytes, err := GetRequest(ST_URL)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var data map[string]interface{}
+	var data *GetStatus
 	err = json.Unmarshal(bytes, &data)
+	if err != nil {
+		return nil, err
+	}
 	return data, err
 } // API_GetStatus
 
-func API_RegisterNewAgent(username string, faction string, email string) (map[string]interface{}, error) {
+func API_RegisterNewAgent(username string, faction string, email string) (*NewAgent, error) {
 	if len(username) < 3 || len(username) > 14 {
 		return nil, APIToolsErr{"Username must be between 3 and 14 characters"}
 	}
@@ -75,12 +78,12 @@ func API_RegisterNewAgent(username string, faction string, email string) (map[st
 	}
 	//convert jsonPost to string
 	strData := string(jsonPost)
-	resp, err := PostRequest(st_URL+"agents/register", strData)
+	resp, err := PostRequest(ST_URL+"register", strData)
 	if err != nil {
 		return nil, err
 	}
 
-	var data2 map[string]interface{}
+	var data2 *NewAgent
 	err = json.Unmarshal(resp, &data2)
 	if err != nil {
 		return nil, err

@@ -6,8 +6,24 @@ import (
 	"strings"
 )
 
+var auth string = ""
+
+func SetAuthCode(code string) {
+	auth = code
+}
+
 func GetRequest(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	if auth != "" {
+		req.Header.Add("Authorization", "Bearer "+auth)
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +37,19 @@ func GetRequest(url string) ([]byte, error) {
 }
 
 func PostRequest(url string, data string) ([]byte, error) {
+
+	client := &http.Client{}
 	reader := strings.NewReader(data)
-	resp, err := http.Post(url, "application/json", reader)
+	req, err := http.NewRequest(http.MethodPost, url, reader)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	if auth != "" {
+		req.Header.Add("Authorization", "Bearer "+auth)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}

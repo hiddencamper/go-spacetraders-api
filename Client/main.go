@@ -7,11 +7,14 @@ import (
 )
 
 func main() {
-	var url = "http://spacetraders.io/api/v2/"
 
-	data, err := APITools.GetRequest(url)
+	status, err := APITools.API_GetStatus()
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 	}
-	fmt.Println(string(data))
+	fmt.Println(status)
+
+	fmt.Println(status.ResetDate)
+	fmt.Println(status.Description)
+	fmt.Println(status.Status)
 }
