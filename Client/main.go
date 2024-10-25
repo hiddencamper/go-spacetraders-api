@@ -1,20 +1,14 @@
 package main
 
 import (
-	"fmt"
-
-	APITools "github.com/hiddencamper/go-spacetraders-api/APITools"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
 
-	status, err := APITools.API_GetStatus()
+	v, err := StartViewInit()
 	if err != nil {
-		fmt.Printf("Error: %s", err)
+		panic(err)
 	}
-	fmt.Println(status)
-
-	fmt.Println(status.ResetDate)
-	fmt.Println(status.Description)
-	fmt.Println(status.Status)
+	tea.NewProgram(v).Run()
 }
