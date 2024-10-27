@@ -2,7 +2,10 @@ module github.com/hiddencamper/go-spacetraders-api
 
 go 1.23.1
 
-require github.com/charmbracelet/bubbletea v1.1.2
+require (
+	github.com/charmbracelet/bubbletea v1.1.2
+	github.com/hiddencamper/go-wordwrap v0.0.0-20241027030243-0798fedcaab6
+)
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
