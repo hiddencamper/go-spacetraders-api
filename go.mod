@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/charmbracelet/bubbletea v1.1.2
-	github.com/hiddencamper/go-wordwrap v1.0.1
+	github.com/hiddencamper/go-wordwrap v1.0.2
 
 )
 

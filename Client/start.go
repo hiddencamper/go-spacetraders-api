@@ -23,6 +23,8 @@ func StartViewInit() (StartView, error) {
 	s.GetStatus = *g
 	s.cursor = 0
 	s.options = []string{"Announcements", "Leaderboards", "Quit"}
+	s.height = 0
+	s.width = 0
 	return s, err
 }
 
@@ -33,16 +35,20 @@ func (m StartView) Init() tea.Cmd {
 func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyCtrlC:
+		switch msg.String() {
+		case "ctrl+c", "q":
 			return m, tea.Quit
-		case tea.KeyUp:
+		case "up":
 			if m.cursor > 0 {
 				m.cursor--
 			}
-		case tea.KeyDown:
+		case "down":
 			if m.cursor < len(m.options)-1 {
 				m.cursor++
+			}
+		case "enter":
+			if m.options[m.cursor] == "Quit" {
+				return m, tea.Quit
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -56,6 +62,11 @@ func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m StartView) View() string {
+	if m.height == 0 || m.width == 0 {
+		//TODO: Add a timer or delay here so that execution can continue
+		//after a delay with a default size of 80w 24/h
+		return ""
+	}
 	g := &m.GetStatus
 	s := "Space Traders Terminal User Interface\n\n"
 	s += fmt.Sprintf("Space Traders API Version: %s\n", g.Version)
