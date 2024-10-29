@@ -111,7 +111,7 @@ func (m StartView) View() string {
 	}
 	if m.current == "Announcements" {
 		if len(g.Announcements) <= 0 {
-			s += "No announcements\n"
+			s += "\nNo announcements\n"
 		} else {
 			s += fmt.Sprintf("\nAnnouncement %d of %d:  %s\n", m.subnum+1, len(g.Announcements), g.Announcements[m.subnum].Title)
 			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Announcements[m.subnum].Body, m.width))
@@ -119,11 +119,11 @@ func (m StartView) View() string {
 	}
 	if m.current == "Leaderboards" {
 
-		s += "Leaderboards not implemented yet\n"
+		s += "\nLeaderboards not implemented yet\n"
 	}
 	if m.current == "Links" {
 		if len(g.Links) <= 0 {
-			s += "No links\n"
+			s += "\nNo links\n"
 		} else {
 			s += fmt.Sprintf("\nLink %d of %d:  %s\n", m.subnum+1, len(g.Links), g.Links[m.subnum].Name)
 			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Links[m.subnum].URL, m.width))
