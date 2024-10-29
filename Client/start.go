@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/charmbracelet/bubbles/viewport"
 	APITools "github.com/hiddencamper/go-spacetraders-api/APITools"
 	wrap "github.com/hiddencamper/go-wordwrap"
 )
@@ -15,6 +17,9 @@ type StartView struct {
 	width     int
 	cursor    int
 	options   []string
+	current   string
+	subnum    int
+	view      viewport.Model
 }
 
 func StartViewInit() (StartView, error) {
@@ -22,14 +27,25 @@ func StartViewInit() (StartView, error) {
 	var s StartView
 	s.GetStatus = *g
 	s.cursor = 0
-	s.options = []string{"Announcements", "Leaderboards", "Quit"}
+	s.options = []string{"Description", "Announcements", "Links", "Leaderboards", "Quit"}
 	s.height = 0
 	s.width = 0
+	s.current = s.options[0]
+	s.subnum = 0
+	s.view = viewport.New(120, 10)
 	return s, err
 }
 
+type TickMsg time.Time
+
+func doTick() tea.Cmd {
+	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
+		return TickMsg(t)
+	})
+}
+
 func (m StartView) Init() tea.Cmd {
-	return tea.ClearScreen
+	return tea.Batch(tea.ClearScreen, doTick())
 }
 
 func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -50,7 +66,26 @@ func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.options[m.cursor] == "Quit" {
 				return m, tea.Quit
 			}
+			m.subnum = 0
+			m.current = m.options[m.cursor]
+		case "left":
+			if m.subnum > 0 {
+				m.subnum--
+			}
+		case "right":
+			if m.current == "Announcements" && m.subnum < len(m.GetStatus.Announcements)-1 {
+				m.subnum++
+			}
+			if m.current == "Links" && m.subnum < len(m.GetStatus.Links)-1 {
+				m.subnum++
+			}
 		}
+	case TickMsg:
+		if m.width == 0 || m.height == 0 {
+			m.height = 24
+			m.width = 80
+		}
+		return m, nil
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
 		m.width = msg.Width
@@ -63,8 +98,6 @@ func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m StartView) View() string {
 	if m.height == 0 || m.width == 0 {
-		//TODO: Add a timer or delay here so that execution can continue
-		//after a delay with a default size of 80w 24/h
 		return ""
 	}
 	g := &m.GetStatus
@@ -72,8 +105,30 @@ func (m StartView) View() string {
 	s += fmt.Sprintf("Space Traders API Version: %s\n", g.Version)
 	s += fmt.Sprintf("Server Status: %s\n", g.Status)
 	s += fmt.Sprintf("Last Reset Date: %s\n", g.ResetDate)
-	s += fmt.Sprintf("\n%s\n\n", wrap.WordWrap(g.Description, m.width))
 
+	if m.current == "Description" {
+		s += fmt.Sprintf("\n\n%s\n\n", wrap.WordWrap(g.Description, m.width))
+	}
+	if m.current == "Announcements" {
+		if len(g.Announcements) <= 0 {
+			s += "No announcements\n"
+		} else {
+			s += fmt.Sprintf("\nAnnouncement %d of %d:  %s\n", m.subnum+1, len(g.Announcements), g.Announcements[m.subnum].Title)
+			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Announcements[m.subnum].Body, m.width))
+		}
+	}
+	if m.current == "Leaderboards" {
+
+		s += "Leaderboards not implemented yet\n"
+	}
+	if m.current == "Links" {
+		if len(g.Links) <= 0 {
+			s += "No links\n"
+		} else {
+			s += fmt.Sprintf("\nLink %d of %d:  %s\n", m.subnum+1, len(g.Links), g.Links[m.subnum].Name)
+			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Links[m.subnum].URL, m.width))
+		}
+	}
 	for i, o := range m.options {
 		if i == m.cursor {
 			s += " > "
@@ -83,5 +138,6 @@ func (m StartView) View() string {
 		s += fmt.Sprintf("%v:%s\n", i+1, o)
 	}
 	s += "\n\nPress q or Control+C to quit\n"
+	s += "Press left or right to change subpage\n"
 	return s
 }
