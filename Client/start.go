@@ -27,7 +27,7 @@ func StartViewInit() (StartView, error) {
 	var s StartView
 	s.GetStatus = *g
 	s.cursor = 0
-	s.options = []string{"Description", "Announcements", "Links", "Leaderboards", "Quit"}
+	s.options = []string{"Start Game", "Description", "Announcements", "Links", "Leaderboards", "Quit"}
 	s.height = 0
 	s.width = 0
 	s.current = s.options[0]
@@ -108,7 +108,7 @@ func (m StartView) View() string {
 	s += fmt.Sprintf("Last Reset Date: %s\n", g.ResetDate)
 	t := "\n"
 	if m.current == "Description" {
-		t += fmt.Sprintf("\n\n%s\n\n", wrap.WordWrap(g.Description, m.width))
+		t += fmt.Sprintf("\n%s\n\n", wrap.WordWrap(g.Description, m.width))
 	}
 	if m.current == "Announcements" {
 		if len(g.Announcements) <= 0 {
