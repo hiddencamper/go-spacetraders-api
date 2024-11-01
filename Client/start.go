@@ -89,6 +89,7 @@ func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
 		m.width = msg.Width
+		m.view.Width = m.width
 		if m.width > 120 {
 			m.width = 120
 		}
@@ -105,39 +106,42 @@ func (m StartView) View() string {
 	s += fmt.Sprintf("Space Traders API Version: %s\n", g.Version)
 	s += fmt.Sprintf("Server Status: %s\n", g.Status)
 	s += fmt.Sprintf("Last Reset Date: %s\n", g.ResetDate)
-
+	t := "\n"
 	if m.current == "Description" {
-		s += fmt.Sprintf("\n\n%s\n\n", wrap.WordWrap(g.Description, m.width))
+		t += fmt.Sprintf("\n\n%s\n\n", wrap.WordWrap(g.Description, m.width))
 	}
 	if m.current == "Announcements" {
 		if len(g.Announcements) <= 0 {
-			s += "\nNo announcements\n"
+			t += "\nNo announcements\n"
 		} else {
-			s += fmt.Sprintf("\nAnnouncement %d of %d:  %s\n", m.subnum+1, len(g.Announcements), g.Announcements[m.subnum].Title)
-			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Announcements[m.subnum].Body, m.width))
+
+			t += fmt.Sprintf("\nAnnouncement %d of %d:  %s\n", m.subnum+1, len(g.Announcements), g.Announcements[m.subnum].Title)
+			t += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Announcements[m.subnum].Body, m.width))
 		}
 	}
 	if m.current == "Leaderboards" {
 
-		s += "\nLeaderboards not implemented yet\n"
+		t += "\nLeaderboards not implemented yet\n"
 	}
 	if m.current == "Links" {
 		if len(g.Links) <= 0 {
-			s += "\nNo links\n"
+			t += "\nNo links\n"
 		} else {
-			s += fmt.Sprintf("\nLink %d of %d:  %s\n", m.subnum+1, len(g.Links), g.Links[m.subnum].Name)
-			s += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Links[m.subnum].URL, m.width))
+			t += fmt.Sprintf("\nLink %d of %d:  %s\n", m.subnum+1, len(g.Links), g.Links[m.subnum].Name)
+			t += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Links[m.subnum].URL, m.width))
 		}
 	}
+	m.view.SetContent(t)
+	u := "\n"
 	for i, o := range m.options {
 		if i == m.cursor {
-			s += " > "
+			u += " > "
 		} else {
-			s += "   "
+			u += "   "
 		}
-		s += fmt.Sprintf("%v:%s\n", i+1, o)
+		u += fmt.Sprintf("%v:%s\n", i+1, o)
 	}
-	s += "\n\nPress q or Control+C to quit\n"
-	s += "Press left or right to change subpage\n"
-	return s
+	u += "\n\nPress q or Control+C to quit\n"
+	u += "Press left or right to change subpage\n"
+	return s + m.view.View() + u
 }
