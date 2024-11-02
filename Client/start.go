@@ -112,6 +112,9 @@ func (m StartView) GenerateMainMenu() string {
 	s += fmt.Sprintf("Space Traders API Version: %s\n", g.Version)
 	s += fmt.Sprintf("Server Status: %s\n", g.Status)
 	s += fmt.Sprintf("Last Reset Date: %s\n", g.ResetDate)
+	s += fmt.Sprintf("Next Reset Date: %s   ", g.ServerResets.Next[0:strings.Index(g.ServerResets.Next, "T")])
+	s += fmt.Sprintf("Time: %s\n", g.ServerResets.Next[strings.Index(g.ServerResets.Next, "T"):])
+	s += fmt.Sprintf("Server Reset Frequency: %s\n", g.ServerResets.Frequency)
 	t := "\n"
 	t += strings.Repeat("-", m.width) + "\n"
 	if m.current == "Description" {
@@ -140,7 +143,7 @@ func (m StartView) GenerateMainMenu() string {
 	}
 	t += strings.Repeat("-", m.width) + "\n"
 	m.view.SetContent(t)
-	u := "\n"
+	u := "\n\n"
 	for i, o := range m.options {
 		if i == m.cursor {
 			u += " > "
