@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,7 +31,7 @@ func StartViewInit() (StartView, error) {
 	s.options = []string{"Start Game", "Description", "Announcements", "Links", "Leaderboards", "Quit"}
 	s.height = 0
 	s.width = 0
-	s.current = s.options[0]
+	s.current = s.options[1]
 	s.subnum = 0
 	s.view = viewport.New(120, 10)
 	return s, err
@@ -93,6 +94,7 @@ func (m StartView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.width > 120 {
 			m.width = 120
 		}
+		return m, tea.ClearScreen
 	}
 	return m, nil
 }
@@ -101,12 +103,17 @@ func (m StartView) View() string {
 	if m.height == 0 || m.width == 0 {
 		return ""
 	}
+	return m.GenerateMainMenu()
+}
+
+func (m StartView) GenerateMainMenu() string {
 	g := &m.GetStatus
 	s := "Space Traders Terminal User Interface\n\n"
 	s += fmt.Sprintf("Space Traders API Version: %s\n", g.Version)
 	s += fmt.Sprintf("Server Status: %s\n", g.Status)
 	s += fmt.Sprintf("Last Reset Date: %s\n", g.ResetDate)
 	t := "\n"
+	t += strings.Repeat("-", m.width) + "\n"
 	if m.current == "Description" {
 		t += fmt.Sprintf("\n%s\n\n", wrap.WordWrap(g.Description, m.width))
 	}
@@ -131,6 +138,7 @@ func (m StartView) View() string {
 			t += fmt.Sprintf("%s\n\n", wrap.WordWrap(g.Links[m.subnum].URL, m.width))
 		}
 	}
+	t += strings.Repeat("-", m.width) + "\n"
 	m.view.SetContent(t)
 	u := "\n"
 	for i, o := range m.options {
